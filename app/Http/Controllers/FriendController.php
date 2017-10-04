@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exceptions\AppException;
 use App\Models\User;
 use App\Models\Friend;
+use DB;
 
 class FriendController extends Controller
 {
@@ -19,16 +20,11 @@ class FriendController extends Controller
         }
 
         // User validation
-        $requestor = User::where('email', $friends[0])->first();
-        $target = User::where('email', $friends[1])->first();
-
-        if (is_null($requestor) || is_null($target)) {
-            throw new AppException("FRIEND002", "The user name you specified is incorrect.");
-        }
-
+        $requestor = User::findOrThrow($friends[0]);
+        $target = User::findOrThrow($friends[1]);
 
         if ($friends[0] == $friends[1]) {
-            throw new AppException("FRIEND003", "You cannot friend yourself.");
+            throw new AppException("FRIEND002", "You cannot friend yourself.");
         }
 
         // Friend existence validation. Note that friend relationship is stored in both direction.
@@ -43,7 +39,7 @@ class FriendController extends Controller
         ])->first();
 
         if (!is_null($friend) && !is_null($friendReverse)) {
-            throw new AppException('FRIEND004', "The friend relationship between 2 users already exists");
+            throw new AppException('FRIEND003', "The friend relationship between 2 users already exists");
         }
 
         // Store friend relationship. The relationship is stored in both direction.
@@ -69,10 +65,7 @@ class FriendController extends Controller
         }
 
         // User validation 
-        $userIns = User::where('email', $email)->first();
-        if (is_null($userIns)) {
-            throw new AppException('LIST002', "The email you specified does not exist.");
-        }
+        $userIns = User::findOrThrow($email);
 
         // Get friends list
         $friends = Friend::with('target')->where('requestorID', $userIns->id)->get();
@@ -87,7 +80,33 @@ class FriendController extends Controller
     // Story 3: As a user, I need an API to retrieve the common friends list between two email addresses.
     public function listCommon()
     {
+        $friends = request()->get('friends');
 
+        // Parameter validation
+        if (is_null($friends) || !is_array($friends) || count($friends) != 2) {
+            throw new AppException('COMMON001', 'Parameter Error');
+        }
+
+        // User validation
+        $userA = User::findOrThrow($friends[0]);
+        $userB = User::findOrThrow($friends[1]);
+
+        if ($friends[0] == $friends[1]) {
+            throw new AppException('COMMON002', 'You specified the same user.');
+        }
+
+        $commonFriends = Friend::with('target')
+                            ->join(DB::raw("friends AS b"), 'friends.targetID', '=', 'b.targetID')
+                            ->where([
+                                ['friends.requestorID', '=', $userA->id],
+                                ['b.requestorID', '=', $userB->id],
+                            ])->get();
+
+        return response()->json([
+            'success' => true,
+            'friends' => $commonFriends->pluck('target.email'),
+            'count' => $commonFriends->count(),
+        ]);
     }
 
     // Story 5: As a user, I need an API to block updates from an email address.
