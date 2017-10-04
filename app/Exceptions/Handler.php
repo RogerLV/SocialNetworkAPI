@@ -45,6 +45,26 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $e)
     {
+        if ($e instanceof AppException){
+            $errorCode = $e->getErrorCode();
+            $errorInfo = $e->getMessage();
+            return $this->handleReturn($request, $errorCode, $errorInfo);
+        } elseif ($e instanceof ModelNotFoundException) {
+            return $this->handleReturn($request, 'MDL001', $e->getModel().' Not Found');
+        }
         return parent::render($request, $e);
+    }
+
+    private function handleReturn($request, $errorCode, $errorMessage)
+    {
+        $para = [
+            'status' => $errorCode,
+            'errorInfo' => $errorMessage
+        ];
+        if ($request->ajax()) {
+            return response()->json($para);
+        } else {
+            return response()->view('errors.general', $para);
+        }
     }
 }
