@@ -15,11 +15,11 @@ class Subscription extends Model
 
     public function requestor() 
     {
-        return $this->hasOne('App\Models\User', 'requestorID', 'id');
+        return $this->hasOne('App\Models\User', 'id', 'requestorID');
     }
 
     public function target() 
     {
-        return $this->hasOne('App\Models\User', 'targetID', 'id');
+        return $this->hasOne('App\Models\User', 'id', 'targetID');
     }
 }

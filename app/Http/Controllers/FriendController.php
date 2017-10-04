@@ -28,7 +28,7 @@ class FriendController extends Controller
 
 
         if ($friends[0] == $friends[1]) {
-            throw new AppException("FRIEND003", "You can friend yourself.");
+            throw new AppException("FRIEND003", "You cannot friend yourself.");
         }
 
         // Friend existence validation. Note that friend relationship is stored in both direction.
@@ -61,7 +61,27 @@ class FriendController extends Controller
 	// Story 2: As a user, I need an API to retrieve the friends list for an email address.
     public function listFriends()
     {
+        $email = request()->get('email');
 
+        // Parameter validation
+        if (is_null($email)) {
+            throw new AppException('LIST001', "Parameter Error.");
+        }
+
+        // User validation 
+        $userIns = User::where('email', $email)->first();
+        if (is_null($userIns)) {
+            throw new AppException('LIST002', "The email you specified does not exist.");
+        }
+
+        // Get friends list
+        $friends = Friend::with('target')->where('requestorID', $userIns->id)->get();
+
+        return response()->json([
+            'success' => true,
+            'friends' => $friends->pluck('target.email'),
+            'count' => $friends->count(),
+        ]);
     }
 
     // Story 3: As a user, I need an API to retrieve the common friends list between two email addresses.
