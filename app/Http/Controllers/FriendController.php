@@ -5,14 +5,13 @@ namespace App\Http\Controllers;
 use App\Exceptions\AppException;
 use App\Models\User;
 use App\Models\Friend;
-use DB;
 
 class FriendController extends Controller
 {
-	// Story 1: As a user, I need an API to create a friend connection between two email addresses.
+    // Story 1: As a user, I need an API to create a friend connection between two email addresses.
     public function friend()
     {
-    	$friends = request()->get('friends');
+        $friends = request()->get('friends');
 
         // Parameter format validation
         if (is_null($friends) || !is_array($friends) || count($friends) != 2) {
@@ -54,7 +53,7 @@ class FriendController extends Controller
         return response()->json(['success' => true]);
     }
 
-	// Story 2: As a user, I need an API to retrieve the friends list for an email address.
+    // Story 2: As a user, I need an API to retrieve the friends list for an email address.
     public function listFriends()
     {
         $email = request()->get('email');
@@ -107,11 +106,5 @@ class FriendController extends Controller
             'friends' => $commonFriends->pluck('target.email'),
             'count' => $commonFriends->count(),
         ]);
-    }
-
-    // Story 5: As a user, I need an API to block updates from an email address.
-    public function block()
-    {
-
     }
 }

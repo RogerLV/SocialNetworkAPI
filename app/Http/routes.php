@@ -30,12 +30,13 @@ Route::get('list\friends', 'FriendController@listFriends')->name('ListFriends');
 // Story 3: As a user, I need an API to retrieve the common friends list between two email addresses.
 Route::get('list\common', 'FriendController@listCommon')->name('ListCommon');
 
-// Story 5: As a user, I need an API to block updates from an email address.
-Route::get('block', 'FriendController@block')->name('Block');
-
 
 // Story 4: As a user, I need an API to subscribe to updates from an email address.
 Route::get('subscribe', 'SubscriptionController@subscribe')->name('Subscribe');
+
+
+// Story 5: As a user, I need an API to block updates from an email address.
+Route::get('block', 'UpdatesController@block')->name('Block');
 
 // Story 6: As a user, I need an API to retrieve all email addresses that can receive updates from an email address.
 Route::get('list\updates', 'UpdatesController@listAll')->name('ListUpdates');
