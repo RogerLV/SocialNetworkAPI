@@ -28,6 +28,7 @@ class Friend extends Model
         $instance  = new Friend();
         $instance->requestorID = $requestor->id;
         $instance->targetID = $target->id;
+        $instance->isBlocked = false;
         $instance->save();
 
         return true;

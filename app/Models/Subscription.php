@@ -22,4 +22,14 @@ class Subscription extends Model
     {
         return $this->hasOne('App\Models\User', 'id', 'targetID');
     }
+
+    public static function addRelationship(User $requestor, User $target)
+    {
+        $instance  = new Subscription();
+        $instance->requestorID = $requestor->id;
+        $instance->targetID = $target->id;
+        $instance->save();
+
+        return true;
+    }
 }
