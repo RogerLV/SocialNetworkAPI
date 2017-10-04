@@ -22,4 +22,14 @@ class Friend extends Model
     {
         return $this->hasOne('App\Models\User', 'targetID', 'id');
     }
+
+    public static function addRelationship(User $requestor, User $target)
+    {
+        $instance  = new Friend();
+        $instance->requestorID = $requestor->id;
+        $instance->targetID = $target->id;
+        $instance->save();
+
+        return true;
+    }
 }

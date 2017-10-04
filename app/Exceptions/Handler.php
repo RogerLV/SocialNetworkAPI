@@ -57,14 +57,9 @@ class Handler extends ExceptionHandler
 
     private function handleReturn($request, $errorCode, $errorMessage)
     {
-        $para = [
-            'status' => $errorCode,
-            'errorInfo' => $errorMessage
-        ];
-        if ($request->ajax()) {
-            return response()->json($para);
-        } else {
-            return response()->view('errors.general', $para);
-        }
+        return response()->json([
+            'success' => false,
+            'message' => $errorCode." ".$errorMessage,
+        ]);
     }
 }
